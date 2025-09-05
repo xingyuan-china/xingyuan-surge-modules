@@ -1,0 +1,51 @@
+#!name=高德地图去广告 (Surge 版)
+#!desc=过滤高德地图开屏广告、首页/搜索/路线规划推广，兼容 Surge iOS & Mac
+#!author=RuCu6 & kokoryh, 改写 by ChatGPT
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Amap.png
+#!category=Tools
+#!openUrl=https://apps.apple.com/app/id461703208
+#!tag=去广告
+#!version=1.0
+#!homepage=https://github.com/luestr/ProxyResource/blob/main/README.md
+#!date=2025-09-05
+
+[Rule]
+# 高德相关域名直连 / 广告屏蔽
+DOMAIN-SUFFIX,amap.com,DIRECT
+DOMAIN-SUFFIX,a-map.cn,DIRECT
+DOMAIN-SUFFIX,a-map.co,DIRECT
+DOMAIN-SUFFIX,a-map.link,DIRECT
+DOMAIN-SUFFIX,a-map.vip,DIRECT
+DOMAIN-SUFFIX,amapauto.com,DIRECT
+DOMAIN-SUFFIX,anav.com,DIRECT
+DOMAIN-SUFFIX,autonavi.com,DIRECT
+DOMAIN-SUFFIX,gaode.com,DIRECT
+
+# 拦截已知广告接口
+URL-REGEX,^http:\/\/.+\/amdc\/mobileDispatch,REJECT
+DOMAIN,amap-aos-info-nogw.amap.com,REJECT
+DOMAIN,free-aos-cdn-image.amap.com,REJECT
+DOMAIN-SUFFIX,v.smtcdns.com,REJECT
+
+[Body Rewrite]
+# 屏蔽搜索业务推广
+http-response ^https:\/\/m5\.amap\.com\/ws\/shield\/search_business\/process\/marketingOperationStructured\? delete-body
+http-response ^https:\/\/m5\.amap\.com\/ws\/shield\/search_poi\/homepage\? delete-body
+http-response ^https:\/\/m5-zb\.amap\.com\/ws\/sharedtrip\/taxi\/order_detail_car_tips\? delete-body
+
+[Map Local]
+# 将广告接口返回空数据
+^https:\/\/m5\.amap\.com\/ws\/shield\/search\/new_hotword\? data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/faas\/amap-navigation\/card-service-(?:car-end|route-plan) data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/shield\/search_poi\/tips_adv\? data-type=text data="{}" status-code=200
+^https:\/\/oss\.amap\.com\/ws\/banner\/lists\/\? data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/aos\/main\/page\/product\/list\? data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/faas\/amap-navigation\/(?:main-page-assets|main-page-location|ridewalk-end-fc) data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/shield\/scene\/recommend\? data-type=text data="{}" status-code=200
+^https:\/\/m5\.amap\.com\/ws\/valueadded\/weather\/v2\? data-type=text data="{}" status-code=200
+^https:\/\/sns\.amap\.com\/ws\/msgbox\/pull_mp\? data-type=text data="{}" status-code=200
+^https:\/\/m5-zb\.amap\.com\/ws\/boss\/tips\/onscene_visual_optimization data-type=text data="{}" status-code=200
+^https:\/\/m5-zb\.amap\.com\/ws\/boss\/pay\/web\/paySuccess\/info\/request data-type=text data="{}" status-code=200
+
+[MITM]
+hostname = %APPEND% m5.amap.com, m5-zb.amap.com, oss.amap.com, sns.amap.com
